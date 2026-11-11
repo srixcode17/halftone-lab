@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halftone Lab — Professional Retro Photo Editor</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%237c3aed'/><circle cx='16' cy='16' r='6' fill='%23ffffff'/></svg>">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ======================================================================
+         TOP NAVIGATION BAR (CANVA-INSPIRED)
+         ====================================================================== -->
+    <header class="app-header">
+      <!-- Left: Brand, File Menu & Project Title -->
+      <div class="header-left">
+        <div class="brand-wrapper">
+          <div class="brand-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="3"/>
+              <circle cx="19" cy="12" r="2"/>
+              <circle cx="5" cy="12" r="2"/>
+              <circle cx="12" cy="19" r="2"/>
+              <circle cx="12" cy="5" r="2"/>
+              <circle cx="17" cy="17" r="1.5"/>
+              <circle cx="7" cy="7" r="1.5"/>
+              <circle cx="17" cy="7" r="1.5"/>
+              <circle cx="7" cy="17" r="1.5"/>
+            </svg>
+          </div>
+          <span class="brand-title">Halftone Lab <span class="brand-badge">PRO</span></span>
+        </div>
+
+        <div class="header-divider"></div>
+
+        <!-- File Menu Dropdown -->
+        <div class="dropdown-wrapper">
+          <button id="menu-file-btn" class="header-menu-btn" title="Project Menu">
+            <span>File</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="file-menu-dropdown" class="dropdown-menu">
+            <button class="dropdown-item" onclick="document.getElementById('file-upload-input').click()">
+              <div class="dropdown-item-left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Open Image...</span>
+              </div>
+              <span class="dropdown-shortcut">Ctrl+O</span>
+            </button>
+            <button class="dropdown-item" onclick="document.getElementById('btn-open-export').click()">
+              <div class="dropdown-item-left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Export Artwork...</span>
+              </div>
+              <span class="dropdown-shortcut">Ctrl+S</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" onclick="document.getElementById('btn-quick-reset').click()">
+              <div class="dropdown-item-left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                <span>Reset All Edits</span>
+              </div>
+            </button>
+            <button class="dropdown-item" onclick="document.getElementById('btn-help').click()">
+              <div class="dropdown-item-left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Keyboard Shortcuts</span>
+              </div>
+              <span class="dropdown-shortcut">?</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Editable Project Title -->
+        <div class="project-title-wrapper">
+          <input type="text" id="project-title" class="project-title-input" value="Untitled Artwork" spellcheck="false" title="Click to rename design">
+        </div>
+
+        <!-- Save Status -->
+        <div class="save-status">
+          <span class="status-dot"></span>
+          <span class="status-text">All changes saved</span>
+        </div>
+      </div>
+
+      <!-- Center: Undo / Redo & History -->
+      <div class="header-center">
+        <div class="history-group">
+          <button id="btn-undo" class="header-icon-btn" title="Undo (Ctrl+Z)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+          </button>
+          <span id="history-badge" class="history-badge">1/1</span>
+          <button id="btn-redo" class="header-icon-btn" title="Redo (Ctrl+Shift+Z)" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Action Buttons & Export -->
+      <div class="header-right">
+        <button id="btn-quick-compare" class="header-btn secondary" title="Toggle Split View Comparison (C)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+          <span>Compare</span>
+        </button>
+
+        <button id="btn-quick-reset" class="header-btn secondary" title="Reset all adjustments and effects to default">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>Reset</span>
+        </button>
+
+        <button id="btn-help" class="header-icon-btn" title="Shortcuts & Documentation (?)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+
+        <button id="btn-quick-download" class="header-btn secondary" title="Quick Download PNG">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download</span>
+        </button>
+
+        <!-- Primary Purple Export Action -->
+        <button id="btn-open-export" class="header-btn primary" title="Export High-Resolution Artwork (Ctrl+S)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          <span>Export</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ======================================================================
+         MAIN APPLICATION AREA
+         ====================================================================== -->
+    <div class="app-main">
+
+      <!-- LEFT TOOL RAIL (CANVA-STYLE DOCK) -->
+      <nav class="tool-rail">
+        <div class="rail-top-tools">
+          <button class="rail-item active" data-tab="uploads" title="Uploads & Sample Images">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span class="rail-label">Uploads</span>
+          </button>
+
+          <button class="rail-item" data-tab="effects" title="Curated Halftone & Retro Effects">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/></svg>
+            <span class="rail-label">Effects</span>
+          </button>
+
+          <button class="rail-item" data-tab="adjust" title="Brightness, Contrast, Saturation & Exposure">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+            <span class="rail-label">Adjust</span>
+          </button>
+
+          <button class="rail-item" data-tab="halftone" title="Halftone Dot Geometry, Inking & Dithering">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/></svg>
+            <span class="rail-label">Halftone</span>
+          </button>
+
+          <button class="rail-item" data-tab="texture" title="Paper Textures, Newsprint & Grunge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <span class="rail-label">Texture</span>
+          </button>
+
+          <button class="rail-item" data-tab="compare" title="Interactive Before & After Comparison">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+            <span class="rail-label">Compare</span>
+          </button>
+        </div>
+
+        <div class="rail-bottom-tools">
+          <button class="rail-item" data-tab="about" title="About Halftone Lab & Shortcuts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span class="rail-label">About</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- CONTEXTUAL TOOL PANEL (CANVA-INSPIRED DRAWER) -->
+      <aside id="tool-panel-container" class="tool-panel-container">
+        <!-- Panel Header -->
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <h2 id="panel-title" class="panel-title">Uploads & Samples</h2>
+          </div>
+          <button id="panel-close-btn" class="panel-close-btn" title="Collapse Panel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+        </div>
+
+        <!-- 1. TAB: UPLOADS & SAMPLES -->
+        <div class="panel-content panel-tab-content" data-tab-view="uploads">
+          <!-- Dropzone inside panel -->
+          <div id="panel-dropzone" class="panel-dropzone">
+            <div class="panel-dropzone-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div>
+              <div class="panel-dropzone-title">Upload Image</div>
+              <div class="panel-dropzone-sub">Drop or click to browse</div>
+            </div>
+          </div>
+          <input type="file" id="file-upload-input" accept="image/jpeg,image/jpg,image/png,image/webp" style="display: none;">
+
+          <!-- Current Image Info (when loaded) -->
+          <div id="current-image-info" class="image-info-box" style="display: none;">
+            <div class="image-info-row">
+              <span class="image-info-label">Dimensions</span>
+              <span id="info-dimensions" class="image-info-val">1400 × 1050 px</span>
+            </div>
+            <div class="image-info-row">
+              <span class="image-info-label">Aspect Ratio</span>
+              <span id="info-aspect" class="image-info-val">1.33</span>
+            </div>
+            <div class="image-info-row">
+              <span class="image-info-label">Processing</span>
+              <span class="image-info-val" style="color: var(--accent-emerald);">100% Local / Private</span>
+            </div>
+          </div>
+
+          <!-- Studio Sample Artwork Grid -->
+          <div class="panel-section">
+            <div class="section-header">
+              <span class="section-title">Creative Studio Samples</span>
+            </div>
+            <div class="sample-photos-grid">
+              <div class="sample-photo-card" data-sample-id="sample-cyberpunk">
+                <div class="sample-photo-overlay">Cyberpunk Portrait</div>
+              </div>
+              <div class="sample-photo-card" data-sample-id="sample-jazz">
+                <div class="sample-photo-overlay">Vintage Jazz Sax</div>
+              </div>
+              <div class="sample-photo-card" data-sample-id="sample-tokyo">
+                <div class="sample-photo-overlay">Tokyo Street</div>
+              </div>
+              <div class="sample-photo-card" data-sample-id="sample-car">
+                <div class="sample-photo-overlay">1970s Sports Car</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. TAB: EFFECTS LIBRARY (21 REAL EFFECTS) -->
+        <div class="panel-content panel-tab-content" data-tab-view="effects" style="display: none;">
+          <!-- Category Navigator -->
+          <div class="effects-category-nav">
+            <button class="effect-cat-btn active" data-category="all">All (21)</button>
+            <button class="effect-cat-btn" data-category="comic">Comic & Manga (8)</button>
+            <button class="effect-cat-btn" data-category="retro">Retro & Analog (7)</button>
+            <button class="effect-cat-btn" data-category="artistic">Artistic (6)</button>
+          </div>
+
+          <!-- Effect Controls Header -->
+          <div class="control-row">
+            <div class="control-label-wrapper">
+              <span class="control-label">Effect Intensity</span>
+              <span id="val-effect-intensity" class="control-value">100%</span>
+            </div>
+            <input type="range" id="effect-intensity-slider" class="slider-input" min="0" max="100" value="100">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end;">
+            <button id="btn-reset-effect" class="section-reset-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              <span>Reset to Original</span>
+            </button>
+          </div>
+
+          <!-- 21 Effect Cards Grid -->
+          <div class="effects-grid">
+            <!-- Comic & Manga (8) -->
+            <div class="effect-card" data-effect-key="classic-manga" data-effect-cat="comic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Classic Manga</div>
+              <div class="effect-card-desc">Screentone dots & bold inks</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="japanese-screentone" data-effect-cat="comic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Japanese Screentone</div>
+              <div class="effect-card-desc">Diamond tone matrix</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="vintage-comic" data-effect-cat="comic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Vintage Comic Book</div>
+              <div class="effect-card-desc">4-color CMYK rosettes</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="pop-art" data-effect-cat="comic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Pop Art</div>
+              <div class="effect-card-desc">Lichtenstein Ben-Day dots</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="newspaper-print" data-effect-cat="comic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Newspaper Print</div>
+              <div class="effect-card-desc">Coarse dots & ink bleed</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="graphic-novel" data-effect-cat="comic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Graphic Novel</div>
+              <div class="effect-card-desc">Frank Miller noir contrast</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="bw-ink" data-effect-cat="comic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Black & White Ink</div>
+              <div class="effect-card-desc">Sumi-e brush wash</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="vintage-comic-dots" data-effect-cat="comic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Vintage Comic Dots</div>
+              <div class="effect-card-desc">Oversized retro dots</div>
+            </div>
+
+            <!-- Retro & Analog (7) -->
+            <div class="effect-card" data-effect-key="retro-print-70s" data-effect-cat="retro">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">1970s Retro Print</div>
+              <div class="effect-card-desc">Amber & teal duotone</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="vintage-newspaper" data-effect-cat="retro">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Vintage Newspaper</div>
+              <div class="effect-card-desc">1920s oxidized newsprint</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="risograph" data-effect-cat="retro">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Risograph</div>
+              <div class="effect-card-desc">Dual-drum stencil screen</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="photocopy" data-effect-cat="retro">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Photocopy</div>
+              <div class="effect-card-desc">Grungy Xerox toner distress</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="grainy-film" data-effect-cat="retro">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Grainy Film</div>
+              <div class="effect-card-desc">Analog silver halide grain</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="old-magazine" data-effect-cat="retro">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Old Magazine</div>
+              <div class="effect-card-desc">1960s glossy publication</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="distressed-print" data-effect-cat="retro">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Distressed Print</div>
+              <div class="effect-card-desc">Woodblock stamp erosion</div>
+            </div>
+
+            <!-- Artistic (6) -->
+            <div class="effect-card" data-effect-key="crosshatch" data-effect-cat="artistic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Crosshatch</div>
+              <div class="effect-card-desc">Multi-angle pen lines</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="stippling" data-effect-cat="artistic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Stippling</div>
+              <div class="effect-card-desc">Hand-stippled ink dots</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="line-art" data-effect-cat="artistic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Line Art</div>
+              <div class="effect-card-desc">Crisp manga contour lines</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="pencil-halftone" data-effect-cat="artistic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Pencil Halftone</div>
+              <div class="effect-card-desc">Soft graphite shading</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="engraving" data-effect-cat="artistic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">Engraving</div>
+              <div class="effect-card-desc">Currency banknote curves</div>
+            </div>
+
+            <div class="effect-card" data-effect-key="high-contrast-noir" data-effect-cat="artistic">
+              <div class="effect-card-thumb"></div>
+              <span class="effect-active-badge">ACTIVE</span>
+              <div class="effect-card-title">High Contrast Noir</div>
+              <div class="effect-card-desc">Pitch obsidian chiaroscuro</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. TAB: PHOTO ADJUSTMENTS -->
+        <div class="panel-content panel-tab-content" data-tab-view="adjust" style="display: none;">
+          <div style="display: flex; justify-content: flex-end;">
+            <button id="btn-reset-all-adj" class="section-reset-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              <span>Reset Adjustments</span>
+            </button>
+          </div>
+
+          <!-- Section: Tone & Exposure -->
+          <div class="panel-section">
+            <span class="section-title">Tone & Exposure</span>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Brightness</span>
+                <div class="control-value-group">
+                  <span id="val-adj-brightness" class="control-value">0</span>
+                  <button id="reset-adj-brightness" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-brightness" class="slider-input" min="-100" max="100" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Contrast</span>
+                <div class="control-value-group">
+                  <span id="val-adj-contrast" class="control-value">0</span>
+                  <button id="reset-adj-contrast" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-contrast" class="slider-input" min="-100" max="100" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Exposure</span>
+                <div class="control-value-group">
+                  <span id="val-adj-exposure" class="control-value">0</span>
+                  <button id="reset-adj-exposure" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-exposure" class="slider-input" min="-100" max="100" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Highlights</span>
+                <div class="control-value-group">
+                  <span id="val-adj-highlights" class="control-value">0</span>
+                  <button id="reset-adj-highlights" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-highlights" class="slider-input" min="-100" max="100" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Shadows</span>
+                <div class="control-value-group">
+                  <span id="val-adj-shadows" class="control-value">0</span>
+                  <button id="reset-adj-shadows" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-shadows" class="slider-input" min="-100" max="100" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Gamma</span>
+                <div class="control-value-group">
+                  <span id="val-adj-gamma" class="control-value">1.0</span>
+                  <button id="reset-adj-gamma" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-gamma" class="slider-input" min="0.2" max="2.5" step="0.05" value="1.0">
+            </div>
+          </div>
+
+          <!-- Section: Color & Mood -->
+          <div class="panel-section">
+            <span class="section-title">Color & Mood</span>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Saturation</span>
+                <div class="control-value-group">
+                  <span id="val-adj-saturation" class="control-value">0</span>
+                  <button id="reset-adj-saturation" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-saturation" class="slider-input" min="-100" max="100" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Temperature</span>
+                <div class="control-value-group">
+                  <span id="val-adj-temperature" class="control-value">0</span>
+                  <button id="reset-adj-temperature" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-temperature" class="slider-input" min="-100" max="100" value="0">
+            </div>
+          </div>
+
+          <!-- Section: Detail & Grain -->
+          <div class="panel-section">
+            <span class="section-title">Detail & Grain</span>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Sharpness</span>
+                <div class="control-value-group">
+                  <span id="val-adj-sharpness" class="control-value">0</span>
+                  <button id="reset-adj-sharpness" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-sharpness" class="slider-input" min="0" max="100" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Film Grain</span>
+                <div class="control-value-group">
+                  <span id="val-adj-grain" class="control-value">0</span>
+                  <button id="reset-adj-grain" class="control-reset-btn" title="Reset">✕</button>
+                </div>
+              </div>
+              <input type="range" id="adj-grain" class="slider-input" min="0" max="100" value="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. TAB: HALFTONE ENGINE -->
+        <div class="panel-content panel-tab-content" data-tab-view="halftone" style="display: none;">
+          <!-- Master Halftone Switch -->
+          <div class="toggle-row">
+            <span class="switch-label" style="font-weight: 700; font-size: 13px;">Enable Halftone Engine</span>
+            <label class="switch-control">
+              <input type="checkbox" id="toggle-halftone-enabled" checked>
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <!-- Dot Geometry -->
+          <div class="panel-section">
+            <span class="section-title">Dot Shape</span>
+            <div class="shape-grid">
+              <button class="shape-btn active" data-shape="circle" title="Round Dot">
+                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+              </button>
+              <button class="shape-btn" data-shape="square" title="Square Dot">
+                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14"/></svg>
+              </button>
+              <button class="shape-btn" data-shape="diamond" title="Diamond Dot">
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12,3 21,12 12,21 3,12"/></svg>
+              </button>
+              <button class="shape-btn" data-shape="ellipse" title="Elliptical Dot">
+                <svg viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="12" rx="9" ry="5"/></svg>
+              </button>
+              <button class="shape-btn" data-shape="line" title="Engraved Line / Stripe">
+                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="10" width="18" height="4"/></svg>
+              </button>
+              <button class="shape-btn" data-shape="crosshatch" title="Crosshatch Hatching">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sizing & Angle -->
+          <div class="panel-section">
+            <span class="section-title">Sizing & Angles</span>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Dot Pitch / Spacing</span>
+                <span id="val-ht-size" class="control-value">10</span>
+              </div>
+              <input type="range" id="ht-size" class="slider-input" min="3" max="50" value="10">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Screen Angle</span>
+                <span id="val-ht-angle" class="control-value">45</span>
+              </div>
+              <input type="range" id="ht-angle" class="slider-input" min="0" max="90" value="45">
+            </div>
+
+            <div class="segmented-control">
+              <button class="segment-btn" data-angle-preset="0">0° Grid</button>
+              <button class="segment-btn" data-angle-preset="45">45° Print</button>
+              <button class="segment-btn" data-angle-preset="60">60° Manga</button>
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Dot Scale</span>
+                <span id="val-ht-scale" class="control-value">100%</span>
+              </div>
+              <input type="range" id="ht-scale" class="slider-input" min="30" max="160" value="100">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Dot Contrast</span>
+                <span id="val-ht-contrast" class="control-value">1.0</span>
+              </div>
+              <input type="range" id="ht-contrast" class="slider-input" min="0.2" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Dot Density</span>
+                <span id="val-ht-density" class="control-value">1.0</span>
+              </div>
+              <input type="range" id="ht-density" class="slider-input" min="0.2" max="2.5" step="0.1" value="1.0">
+            </div>
+
+            <!-- Invert Switch -->
+            <div class="toggle-row" style="margin-top: 6px;">
+              <span class="switch-label">Invert Dot Polarity</span>
+              <label class="switch-control">
+                <input type="checkbox" id="toggle-ht-invert">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Inking & Color Mode -->
+          <div class="panel-section">
+            <span class="section-title">Color Mode</span>
+            <div class="segmented-control">
+              <button class="segment-btn active" data-colormode="mono">Mono</button>
+              <button class="segment-btn" data-colormode="cmyk">CMYK</button>
+              <button class="segment-btn" data-colormode="duotone">Duotone</button>
+              <button class="segment-btn" data-colormode="color">RGB</button>
+            </div>
+
+            <!-- Ink & Paper Pickers -->
+            <div class="color-picker-row">
+              <span class="control-label">Ink Color</span>
+              <div class="color-swatches">
+                <button class="color-swatch-btn" data-ink-swatch="#111827" style="background: #111827;" title="Black"></button>
+                <button class="color-swatch-btn" data-ink-swatch="#1e1b4b" style="background: #1e1b4b;" title="Navy"></button>
+                <button class="color-swatch-btn" data-ink-swatch="#0f766e" style="background: #0f766e;" title="Teal"></button>
+                <button class="color-swatch-btn" data-ink-swatch="#991b1b" style="background: #991b1b;" title="Red"></button>
+                <div class="color-input-wrapper">
+                  <input type="color" id="picker-ink-color" class="color-input-native" value="#111827">
+                </div>
+              </div>
+            </div>
+
+            <div class="color-picker-row">
+              <span class="control-label">Paper Color</span>
+              <div class="color-swatches">
+                <button class="color-swatch-btn" data-paper-swatch="#ffffff" style="background: #ffffff;" title="White"></button>
+                <button class="color-swatch-btn" data-paper-swatch="#fef9c3" style="background: #fef9c3;" title="Newsprint"></button>
+                <button class="color-swatch-btn" data-paper-swatch="#e7e5e4" style="background: #e7e5e4;" title="Parchment"></button>
+                <button class="color-swatch-btn" data-paper-swatch="#0f172a" style="background: #0f172a;" title="Dark Charcoal"></button>
+                <div class="color-input-wrapper">
+                  <input type="color" id="picker-paper-color" class="color-input-native" value="#ffffff">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dithering & Print Emulation -->
+          <div class="panel-section">
+            <span class="section-title">Dithering & Contours</span>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Dither Algorithm</span>
+              </div>
+              <select id="select-dither-algo" style="padding: 6px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 12px; background: #fff;">
+                <option value="none">Geometric Halftone (None)</option>
+                <option value="floyd-steinberg">Floyd-Steinberg Error Diffusion</option>
+                <option value="atkinson">Atkinson (MacPaint Style)</option>
+                <option value="bayer2">Bayer 2x2 Matrix</option>
+                <option value="bayer4">Bayer 4x4 Ordered Matrix</option>
+                <option value="bayer8">Bayer 8x8 Ordered Matrix</option>
+                <option value="random">Stochastic Random Dither</option>
+              </select>
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Dithering Intensity</span>
+                <span id="val-ht-dither-amount" class="control-value">100%</span>
+              </div>
+              <input type="range" id="ht-dither-amount" class="slider-input" min="10" max="100" value="100">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Edge Contours (Sobel)</span>
+                <span id="val-ht-edge" class="control-value">0</span>
+              </div>
+              <input type="range" id="ht-edge" class="slider-input" min="0" max="100" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Ink Bleed / Softness</span>
+                <span id="val-ht-bleed" class="control-value">0</span>
+              </div>
+              <input type="range" id="ht-bleed" class="slider-input" min="0" max="30" value="0">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Tone Threshold</span>
+                <span id="val-ht-threshold" class="control-value">0</span>
+              </div>
+              <input type="range" id="ht-threshold" class="slider-input" min="0" max="80" value="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. TAB: TEXTURE & PAPER -->
+        <div class="panel-content panel-tab-content" data-tab-view="texture" style="display: none;">
+          <div class="panel-section">
+            <span class="section-title">Procedural Paper Surface</span>
+            <div class="textures-grid">
+              <div class="texture-card active" data-texture-type="none">
+                <div class="texture-card-swatch" style="background: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted);">None</div>
+                <div class="texture-card-title">Clean White</div>
+              </div>
+              <div class="texture-card" data-texture-type="clean">
+                <div class="texture-card-swatch" style="background: #fdfbf7;"></div>
+                <div class="texture-card-title">Fine Matte</div>
+              </div>
+              <div class="texture-card" data-texture-type="parchment">
+                <div class="texture-card-swatch" style="background: #fbf5e5;"></div>
+                <div class="texture-card-title">Aged Parchment</div>
+              </div>
+              <div class="texture-card" data-texture-type="newspaper">
+                <div class="texture-card-swatch" style="background: #e9e4d6;"></div>
+                <div class="texture-card-title">Newspaper Print</div>
+              </div>
+              <div class="texture-card" data-texture-type="recycled">
+                <div class="texture-card-swatch" style="background: #f5f2ea;"></div>
+                <div class="texture-card-title">Rough Recycled</div>
+              </div>
+              <div class="texture-card" data-texture-type="yellow">
+                <div class="texture-card-swatch" style="background: #fef08a;"></div>
+                <div class="texture-card-title">Vintage Yellow</div>
+              </div>
+              <div class="texture-card" data-texture-type="grunge">
+                <div class="texture-card-swatch" style="background: #eae8e1;"></div>
+                <div class="texture-card-title">Grunge Distress</div>
+              </div>
+              <div class="texture-card" data-texture-type="heavy-grain">
+                <div class="texture-card-swatch" style="background: #e2e8f0;"></div>
+                <div class="texture-card-title">Heavy Grain</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <span class="section-title">Texture Controls</span>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Texture Intensity</span>
+                <span id="val-texture-intensity" class="control-value">40%</span>
+              </div>
+              <input type="range" id="texture-intensity-slider" class="slider-input" min="0" max="100" value="40">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Texture Scale</span>
+                <span id="val-texture-scale" class="control-value">100%</span>
+              </div>
+              <input type="range" id="texture-scale-slider" class="slider-input" min="50" max="250" value="100">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Paper Grain Amount</span>
+                <span id="val-texture-grain" class="control-value">25</span>
+              </div>
+              <input type="range" id="texture-grain-slider" class="slider-input" min="0" max="80" value="25">
+            </div>
+
+            <div class="control-row">
+              <div class="control-label-wrapper">
+                <span class="control-label">Blend Mode</span>
+              </div>
+              <select id="select-texture-blend" style="padding: 6px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 12px; background: #fff;">
+                <option value="multiply">Multiply (Classic Ink Print)</option>
+                <option value="overlay">Overlay (Dynamic Contrast)</option>
+                <option value="soft-light">Soft Light (Subtle Paper)</option>
+                <option value="normal">Normal</option>
+              </select>
+            </div>
+
+            <div class="color-picker-row">
+              <span class="control-label">Paper Wash Tint</span>
+              <div class="color-input-wrapper">
+                <input type="color" id="picker-paper-tint" class="color-input-native" value="#fdfbf7">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. TAB: COMPARE (BEFORE / AFTER) -->
+        <div class="panel-content panel-tab-content" data-tab-view="compare" style="display: none;">
+          <div class="panel-section">
+            <span class="section-title">Interactive Comparison</span>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;">
+              Inspect your halftone artwork side-by-side with the original photograph using the real-time split divider.
+            </p>
+
+            <button class="header-btn secondary" onclick="document.getElementById('btn-quick-compare').click()" style="justify-content: center; width: 100%; margin-top: 8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+              <span>Toggle Split View</span>
+            </button>
+          </div>
+
+          <div class="panel-section">
+            <span class="section-title">Split Orientation</span>
+            <div class="segmented-control">
+              <button class="segment-btn active" data-compare-orientation="vertical">Vertical</button>
+              <button class="segment-btn" data-compare-orientation="horizontal">Horizontal</button>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label-wrapper">
+              <span class="control-label">Split Position</span>
+              <span id="val-compare-split" class="control-value">50%</span>
+            </div>
+            <input type="range" id="compare-split-slider" class="slider-input" min="5" max="95" value="50">
+          </div>
+
+          <div class="panel-section">
+            <span class="section-title">Quick Peek Shortcut</span>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+              Hold <span class="shortcut-key">Spacebar</span> anytime on the canvas to instantly reveal the 100% original unedited image. Release to restore your halftone artwork.
+            </p>
+          </div>
+        </div>
+
+        <!-- 7. TAB: ABOUT & SHORTCUTS -->
+        <div class="panel-content panel-tab-content" data-tab-view="about" style="display: none;">
+          <div class="panel-section">
+            <span class="section-title">About Halftone Lab</span>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+              <strong>Halftone Lab</strong> is a professional browser-based creative photo editing studio designed for printmakers, illustrators, and comic artists.
+            </p>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+              All rendering and pixel processing runs 100% locally in your browser using the HTML5 Canvas API. No photos are ever uploaded to any server.
+            </p>
+          </div>
+
+          <div class="panel-section">
+            <span class="section-title">Keyboard Shortcuts</span>
+            <table class="shortcuts-table">
+              <tr>
+                <td><span class="shortcut-key">Ctrl + Z</span></td>
+                <td>Undo change</td>
+              </tr>
+              <tr>
+                <td><span class="shortcut-key">Ctrl + Shift + Z</span></td>
+                <td>Redo change</td>
+              </tr>
+              <tr>
+                <td><span class="shortcut-key">Ctrl + S</span></td>
+                <td>Export Artwork</td>
+              </tr>
+              <tr>
+                <td><span class="shortcut-key">Ctrl + O</span></td>
+                <td>Open Image File</td>
+              </tr>
+              <tr>
+                <td><span class="shortcut-key">C</span></td>
+                <td>Toggle Compare Split</td>
+              </tr>
+              <tr>
+                <td><span class="shortcut-key">Space (Hold)</span></td>
+                <td>Peek Original Image</td>
+              </tr>
+              <tr>
+                <td><span class="shortcut-key">+ / -</span></td>
+                <td>Zoom In / Out</td>
+              </tr>
+              <tr>
+                <td><span class="shortcut-key">0</span></td>
+                <td>Fit Canvas to Screen</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ======================================================================
+           MAIN EDITING WORKSPACE
+           ====================================================================== -->
+      <main id="canvas-workspace" class="canvas-workspace">
+
+        <!-- Processing Indicator Badge -->
+        <div id="processing-indicator" class="processing-indicator">
+          <div class="spinner-icon"></div>
+          <span>Rendering Artwork...</span>
+        </div>
+
+        <!-- EMPTY STATE (WHEN NO IMAGE IS LOADED) -->
+        <div id="workspace-empty-state" class="workspace-empty-state">
+          <div class="empty-state-illustration">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </div>
+
+          <div>
+            <h1 class="empty-state-title">Start creating something extraordinary.</h1>
+            <p class="empty-state-sub">Transform ordinary photographs into retro comics, manga screentones, newspaper prints, and vintage halftone artwork.</p>
+          </div>
+
+          <div id="empty-drop-area" class="empty-drop-area">
+            <button id="empty-btn-browse" class="empty-btn-browse">Browse Files</button>
+            <span class="empty-formats-tag">or drag and drop JPG, PNG, WEBP</span>
+          </div>
+
+          <!-- Quick Samples Picker -->
+          <div class="empty-samples-section">
+            <div class="empty-samples-heading">Try with sample artwork</div>
+            <div class="empty-samples-row">
+              <div class="empty-sample-card" data-sample-id="sample-cyberpunk">
+                <div class="empty-sample-title">Cyberpunk</div>
+              </div>
+              <div class="empty-sample-card" data-sample-id="sample-jazz">
+                <div class="empty-sample-title">Vintage Jazz</div>
+              </div>
+              <div class="empty-sample-card" data-sample-id="sample-tokyo">
+                <div class="empty-sample-title">Tokyo Street</div>
+              </div>
+              <div class="empty-sample-card" data-sample-id="sample-car">
+                <div class="empty-sample-title">1970s Car</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVE CANVAS STAGE (TRANSFORMABLE) -->
+        <div id="canvas-stage-wrapper" class="canvas-stage-wrapper">
+          <div id="canvas-transform-layer" class="canvas-transform-layer">
+            <canvas id="display-canvas"></canvas>
+
+            <!-- Before/After Split Line & Handle -->
+            <div id="compare-divider" class="compare-divider-line" style="display: none;">
+              <div class="compare-handle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+
+            <!-- Compare Badges -->
+            <span class="compare-badge before" style="display: none;">ORIGINAL</span>
+            <span class="compare-badge after" style="display: none;">HALFTONE LAB</span>
+          </div>
+        </div>
+
+        <!-- FLOATING BOTTOM TOOLBAR (ZOOM & VIEW) -->
+        <div class="canvas-bottom-bar">
+          <button id="btn-zoom-out" class="zoom-btn" title="Zoom Out (-)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <span id="zoom-percentage" class="zoom-level-pill" title="Reset to 100%">100%</span>
+          <button id="btn-zoom-in" class="zoom-btn" title="Zoom In (+)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="bar-divider"></div>
+          <button id="btn-fit-screen" class="zoom-btn" title="Fit to Screen (0)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          </button>
+          <button id="btn-zoom-100" class="zoom-btn" title="Actual Size 1:1">
+            <span style="font-size: 11px; font-weight: 700;">1:1</span>
+          </button>
+          <button id="btn-toggle-fullscreen" class="zoom-btn" title="Fullscreen Workspace">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <!-- ======================================================================
+         EXPORT MODAL (CANVA-STYLE DIALOG)
+         ====================================================================== -->
+    <div id="export-modal" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">Export Artwork</h3>
+          <button class="modal-close-btn" title="Close">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- File Format Selection -->
+          <div class="control-row">
+            <span class="control-label">File Type</span>
+            <div class="segmented-control">
+              <button class="segment-btn active" data-export-format="png">PNG (Lossless)</button>
+              <button class="segment-btn" data-export-format="jpeg">JPEG (Print)</button>
+              <button class="segment-btn" data-export-format="webp">WebP (Modern)</button>
+            </div>
+          </div>
+
+          <!-- Resolution Scaling -->
+          <div class="control-row">
+            <span class="control-label">Resolution Scale</span>
+            <div class="segmented-control">
+              <button class="segment-btn active" data-export-scale="1">1x (Original)</button>
+              <button class="segment-btn" data-export-scale="2">2x (Ultra Print)</button>
+              <button class="segment-btn" data-export-scale="0.5">0.5x (Web)</button>
+            </div>
+          </div>
+
+          <!-- Quality Slider (JPEG / WebP) -->
+          <div id="export-quality-group" class="control-row">
+            <div class="control-label-wrapper">
+              <span class="control-label">Image Quality</span>
+              <span id="val-export-quality" class="control-value">92%</span>
+            </div>
+            <input type="range" id="export-quality-slider" class="slider-input" min="10" max="100" value="92">
+          </div>
+
+          <!-- File Name -->
+          <div class="control-row">
+            <span class="control-label">File Name</span>
+            <input type="text" id="export-filename" class="project-title-input" style="max-width: 100%; width: 100%; border: 1px solid var(--border-subtle); padding: 7px 10px;" value="halftone-artwork">
+          </div>
+
+          <!-- Transparent Background Checkbox (for PNG) -->
+          <div class="toggle-row">
+            <span class="switch-label">Transparent Paper Background (PNG only)</span>
+            <label class="switch-control">
+              <input type="checkbox" id="toggle-export-transparent">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <!-- Summary Block -->
+          <div class="export-details-block">
+            <div class="export-detail-row">
+              <span class="export-detail-label">Dimensions</span>
+              <span id="export-dim" class="export-detail-val">1400 × 1050 px</span>
+            </div>
+            <div class="export-detail-row">
+              <span class="export-detail-label">Format</span>
+              <span id="export-format-summary" class="export-detail-val">PNG</span>
+            </div>
+            <div class="export-detail-row">
+              <span class="export-detail-label">Est. File Size</span>
+              <span id="export-est-size" class="export-detail-val">~1.2 MB</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btn-copy-clipboard" class="header-btn secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy to Clipboard</span>
+          </button>
+          <button id="btn-confirm-download" class="header-btn primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download Image</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         HELP / SHORTCUTS MODAL
+         ====================================================================== -->
+    <div id="help-modal" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">Halftone Lab — Quick Guide & Shortcuts</h3>
+          <button class="modal-close-btn" title="Close">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+            Master your workflow with standard creative studio shortcuts:
+          </p>
+          <table class="shortcuts-table">
+            <tr>
+              <td><span class="shortcut-key">Ctrl + Z</span></td>
+              <td>Undo previous action</td>
+            </tr>
+            <tr>
+              <td><span class="shortcut-key">Ctrl + Shift + Z</span></td>
+              <td>Redo reverted action</td>
+            </tr>
+            <tr>
+              <td><span class="shortcut-key">Ctrl + S</span></td>
+              <td>Open Export & Download dialog</td>
+            </tr>
+            <tr>
+              <td><span class="shortcut-key">Ctrl + O</span></td>
+              <td>Upload / Open local image</td>
+            </tr>
+            <tr>
+              <td><span class="shortcut-key">C</span></td>
+              <td>Toggle Before/After split view</td>
+            </tr>
+            <tr>
+              <td><span class="shortcut-key">Spacebar (Hold)</span></td>
+              <td>Peek 100% original photograph</td>
+            </tr>
+            <tr>
+              <td><span class="shortcut-key">+ / -</span></td>
+              <td>Zoom in / Zoom out</td>
+            </tr>
+            <tr>
+              <td><span class="shortcut-key">0</span></td>
+              <td>Fit canvas to workspace</td>
+            </tr>
+            <tr>
+              <td><span class="shortcut-key">Shift + Drag</span></td>
+              <td>Pan canvas when zoomed in</td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button class="header-btn primary modal-close-btn" style="border-radius: var(--radius-md);">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
